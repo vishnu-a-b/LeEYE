@@ -48,7 +48,7 @@ function Login() {
             <form action="POST">
                 <input type="name" onChange={(e) => { setName(e.target.value) }} placeholder="name"  />
                 <input type="password" onChange={(e) => { setPassword(e.target.value) }} placeholder="Password"  />
-                <input type="submit" className="button" onClick={submit} />
+                <input type="submit" className="button" value="Login" onClick={submit} />
 
             </form>
 

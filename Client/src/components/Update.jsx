@@ -65,7 +65,6 @@ function Update({ location }) {
     <div className="container">
       <div className="login">
         <h1>Update</h1>
-        {imageUrl && <img src={imageUrl} alt="User Image" />}
         <form onSubmit={handleSubmit}>
           <input
             type="text"
