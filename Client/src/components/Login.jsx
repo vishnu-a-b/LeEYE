@@ -41,14 +41,14 @@ function Login() {
 
 
     return (
-        <div className="login">
-
+        <div className="container">
+            <div className="login">
             <h1>Login</h1>
 
             <form action="POST">
                 <input type="name" onChange={(e) => { setName(e.target.value) }} placeholder="name"  />
                 <input type="password" onChange={(e) => { setPassword(e.target.value) }} placeholder="Password"  />
-                <input type="submit" onClick={submit} />
+                <input type="submit" className="button" onClick={submit} />
 
             </form>
 
@@ -57,7 +57,7 @@ function Login() {
             <br />
 
             <Link to="/signup">Signup Page</Link>
-
+            </div>
         </div>
     )
 }

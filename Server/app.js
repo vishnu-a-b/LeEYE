@@ -1,50 +1,43 @@
 const express = require("express");
 const collection = require("./mongo");
 const multer = require("multer");
-const path = require("path");
 const app = express();
+const cors = require("cors");
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const cors = require("cors");
 app.use(cors());
-app.get("/", cors(), (req, res) => {});
 
-// Multer storage configuration
-const storage = multer.diskStorage({
-  destination: "./images",
-  filename: function (req, file, cb) {
-    cb(null, req.body.name + path.extname(file.originalname));
-  },
+// Multer configuration
+const upload = multer();
+
+app.get("/", cors(), (req, res) => {
+  // Handle root route request
 });
 
-// Multer upload instance
-const upload = multer({ storage });
-
 app.get("/user/:name", async (req, res) => {
-    const name = req.params.name;
-  
-    try {
-      const user = await collection.findOne({ name: name });
-  
-      if (user) {
-        const userData = {
-          name: user.name,
-          password: user.password,
-          address: user.address,
-          imageUrl: `http://localhost:8000/images/${user.image}`,
-        };
-  
-        res.json(userData);
-      } else {
-        res.status(404).json({ error: "User not found" });
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error" });
+  const name = req.params.name;
+
+  try {
+    const user = await collection.findOne({ name: name });
+
+    if (user) {
+      const userData = {
+        name: user.name,
+        password: user.password,
+        address: user.address,
+        imageUrl: user.image, // Assuming image is stored as base64 string
+      };
+
+      res.json(userData);
+    } else {
+      res.status(404).json({ error: "User not found" });
     }
-  });
-  
-  
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 app.post("/", async (req, res) => {
   const { name, password } = req.body;
@@ -64,11 +57,15 @@ app.post("/", async (req, res) => {
 
 app.post("/signup", upload.single("image"), async (req, res) => {
   const { name, password, address } = req.body;
-  const image = req.file.filename;
+  const image = req.file; // Assuming image is uploaded as a file
+
+  // Read the uploaded image file as base64
+  const base64Image = image.buffer.toString("base64");
+
   const data = {
     name: name,
     password: password,
-    image: image,
+    image: base64Image,
     address: address,
   };
 
@@ -88,7 +85,14 @@ app.post("/signup", upload.single("image"), async (req, res) => {
 
 app.post("/update", upload.single("image"), async (req, res) => {
   const { name, password, address } = req.body;
-  const image = req.file ? req.file.filename : null;
+  const image = req.file; // Assuming image is uploaded as a file
+
+  // Check if an image file is uploaded
+  let updatedImage = null;
+  if (image) {
+    // Read the uploaded image file as base64
+    updatedImage = image.buffer.toString("base64");
+  }
 
   try {
     const user = await collection.findOne({ name: name });
@@ -99,7 +103,7 @@ app.post("/update", upload.single("image"), async (req, res) => {
     const updatedData = {
       name: name || user.name,
       password: password || user.password,
-      image: image || user.image,
+      image: updatedImage || user.image,
       address: address || user.address,
     };
 

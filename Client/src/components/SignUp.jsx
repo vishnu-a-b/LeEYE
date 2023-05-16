@@ -8,7 +8,18 @@ function SignUp() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [address, setAddress] = useState("");
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
 
   async function submit(e) {
     e.preventDefault();
@@ -19,7 +30,7 @@ function SignUp() {
       formData.append("password", password);
       formData.append("image", image);
       formData.append("address", address);
-
+      console.log(formData)
       await axios
         .post("http://localhost:8000/signup", formData, {
           headers: {
@@ -43,45 +54,45 @@ function SignUp() {
   }
 
   return (
-    <div className="login">
-      <h1>Signup</h1>
+    <div className="container">
+      <div className="login">
+        <h1>Signup</h1>
 
-      <form action="POST">
-        <input
-          type="name"
-          onChange={(e) => {
-            setName(e.target.value);
-          }}
-          placeholder="Name"
-        />
-        <input
-          type="password"
-          onChange={(e) => {
-            setPassword(e.target.value);
-          }}
-          placeholder="Password"
-        />
-        <input
-          type="file"
-          onChange={(e) => {
-            setImage(e.target.files[0]);
-          }}
-        />
-        <input
-          type="text"
-          onChange={(e) => {
-            setAddress(e.target.value);
-          }}
-          placeholder="Address"
-        />
-        <input type="submit" onClick={submit} />
-      </form>
+        <form action="POST">
+          <input
+            type="name"
+            onChange={(e) => {
+              setName(e.target.value);
+            }}
+            placeholder="Name"
+          />
+          <input
+            type="password"
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+            placeholder="Password"
+          />
+          <input type="file" onChange={handleImageChange} />
+          {imagePreview && (
+            <img src={imagePreview} alt="Preview" style={{ width: "100px" }} />
+          )}
+          <textarea 
+            type="text"
+            onChange={(e) => {
+              setAddress(e.target.value);
+            }}
+            placeholder="Address"
+          />
+          <input type="submit" value="Register" className="button" onClick={submit} />
+        </form>
 
-      <br />
-      <p>OR</p>
-      <br />
+        <br />
+        <p>OR</p>
+        <br />
 
-      <Link to="/">Login Page</Link>
+        <Link to="/">Login Page</Link>
+      </div>
     </div>
   );
 }
